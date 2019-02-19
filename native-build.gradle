@@ -7,11 +7,21 @@ ext.nativeBuild = {buildDir, projectDir, name, os ->
         return;
     }
     def sharedSources = shareDir.listFiles();
-    def osSources = ["$projectDir/src/main/native/$os/*"]
+    def osSources = [];
     def arch = "x86-64"
 
-    // def HASOSS = file("$projectDir/src/main/native/share/$os").exists();
-    // def sources = HASOSS? "$sharedSources $osSources".flatten() : "$sharedSources".flatten()
+    File osDir = file("$projectDir/src/main/native/$os");
+    def HASOSS = osDir.exists();
+    if (HASOSS) {
+        osSources = osDir.listFiles();
+    }
+
+    def JAVAHOME = "/opt/jdk-11.0.2.jdk/Contents/Home" // TODO replace with property
+    def includeFlags = "-I$JAVAHOME/include" 
+    def osincludeFlags = "" 
+    if (os == "ios") {
+        osincludeFlags = "-I$JAVAHOME/include/darwin"
+    }
 
     def compileOutput = "$buildDir/native/$os-$arch"
     new File(compileOutput).mkdirs()
@@ -19,7 +29,7 @@ ext.nativeBuild = {buildDir, projectDir, name, os ->
     def compiler = "gcc";
 
     def cargs = [
-        "-c", sharedSources
+        "-c", includeFlags, osincludeFlags, sharedSources, osSources
     ].flatten()
 
     exec {
