@@ -1,0 +1,36 @@
+ext.nativeBuild = {buildDir, projectDir, name, os -> 
+
+    println("native build start");
+    File shareDir = file("$projectDir/src/main/native/share");
+    if (!shareDir.exists()) {
+        println("No native lib dir found for $name");
+        return;
+    }
+    // def sharedSources = ["$projectDir/src/main/native/share/*"]
+    def sharedSources = shareDir.list();
+    def osSources = ["$projectDir/src/main/native/$os/*"]
+    def arch = "x86-64"
+
+    // def HASOSS = file("$projectDir/src/main/native/share/$os").exists();
+    // def sources = HASOSS? "$sharedSources $osSources".flatten() : "$sharedSources".flatten()
+
+    def compileOutput = "$buildDir/native/$os-$arch"
+    new File(compileOutput).mkdirs()
+
+    def compiler = "gcc";
+
+    def cargs = [
+        "-c", sharedSources
+    ].flatten()
+
+    exec {
+        executable "/usr/bin/gcc"
+        args cargs
+        workingDir compileOutput
+    println("native build exec done");
+    }
+    println("native build done");
+    doLast {
+    println("native build doLast");
+    }
+}

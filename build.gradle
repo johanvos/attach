@@ -5,12 +5,26 @@ plugins {
 subprojects {
     apply plugin: "java-library"
     apply plugin: "org.openjfx.javafxplugin"
+    apply from: rootProject.file("native-build.gradle")
 
     sourceCompatibility = 11
     targetCompatibility = 11
 
     repositories {
         mavenCentral()
+    }
+
+    if (project.hasProperty('os')) {
+        def service = getServiceName(project.name)
+        def osname = project.os
+        task nativeLib {
+            doLast {
+                nativeBuild("$project.buildDir","$project.projectDir", "$service", "$osname");
+            }
+        }
+        jar {
+            dependsOn nativeLib
+        }
     }
 
     if (project.hasProperty('classifier')) {
