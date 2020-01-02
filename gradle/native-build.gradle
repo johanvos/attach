@@ -30,6 +30,8 @@ ext.nativeBuild = { buildDir, projectDir, name, os ->
     def osIncludeFlags = ""
 
     if (os == "ios") {
+println("COMPILE FOR IOS");
+Thread.dumpStack();
         osIncludeFlags = "-I$JAVAHOME/include/darwin"
 
         def linkerOutputs = []
@@ -109,6 +111,30 @@ ext.nativeBuild = { buildDir, projectDir, name, os ->
         if (n.exists()) {
             println "Adding $n to native jar"
             n
+        }
+    }
+    else if (os == "android") {
+println("COMPILE FOR ANDROID");
+        def compileOutput = "$buildDir/native/$os"
+        new File(compileOutput).mkdirs()
+
+        def compiler = "aarch64-linux-android"
+
+        def cargs = ["--target", "aarch64-linux-android",
+                "-c", includeFlags, osIncludeFlags, sharedSources, osSources
+        ].flatten()
+
+        exec {
+            executable $compiler
+            args cargs
+            workingDir compileOutput
+        }
+        // TODO
+        File n = new File("$buildDir/native/${os}")
+        if (n.exists()) {
+            println "Adding lib${name} to native jar"
+            fileTree("$buildDir/native/${os}").filter { it.isFile() }.files
+                    .first()
         }
     } else {
         // TODO
