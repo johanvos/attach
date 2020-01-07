@@ -60,17 +60,20 @@ public class DefaultServiceFactory<T> implements ServiceFactory<T> {
 
     private T createInstance(Platform platform) {
         String fqn = serviceType.getPackageName() + ".impl." + className(platform);
+System.err.println("DefaultServiceFactory needs to find "+fqn);
         try {
             Class<T> clazz = (Class<T>) Class.forName(fqn);
+System.err.println("DefaultServiceFactory got clazz "+clazz);
             if (clazz != null) {
                 LOGGER.fine("Service class for: " + clazz.getName());
+                System.err.println("Service class for: " + clazz.getName());
                 return clazz.getDeclaredConstructor().newInstance();
             }
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             // no-op
-            LOGGER.log(Level.WARNING, "No new instance for " + serviceType);
+            LOGGER.log(Level.WARNING, "No new instance for " + serviceType + " on platform " + platform);
         }
         return null;
     }

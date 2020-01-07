@@ -65,12 +65,18 @@ public enum Platform {
     private static final Logger LOGGER = Logger.getLogger(Platform.class.getName());
 
     static {
-        String os = System.getProperty("os.name", DESKTOP.getName()).toLowerCase(Locale.ROOT);
+        String os = System.getProperty("javafx.platform", "none").toLowerCase(Locale.ROOT);
+System.err.println("JavaFXPLATFORMCLINIT, OS = "+os);
+        if ("none".equals(os)) {
+            os = System.getProperty("os.name", DESKTOP.getName()).toLowerCase(Locale.ROOT);
+        }
+System.err.println("PLATFORMCLINIT, OS = "+os);
         if (os.contains("mac") || os.contains("win") || os.contains("nux")) {
             os = DESKTOP.getName();
         }
         String name = os.toUpperCase(Locale.ROOT);
         current = valueOf(name);
+System.err.println("CURRENT PLATFORM = "+current);
         LOGGER.fine("Current platform: "  + current);
     }
 
