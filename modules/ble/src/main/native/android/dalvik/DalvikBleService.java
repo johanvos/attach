@@ -88,7 +88,7 @@ public class DalvikBleService  {
     }
 
     private void init() {
-        Log.v(TAG, "DalvikBle, init");
+        Log.v(TAG, "DalvikBle, private void init");
         boolean fineloc = Util.verifyPermissions(Manifest.permission.ACCESS_FINE_LOCATION);
         if (!fineloc) {
             Log.v(TAG, "No permission to get fine location");
@@ -119,7 +119,7 @@ public class DalvikBleService  {
         } else {
             scanner = adapter.getBluetoothLeScanner();
         }
-
+        Log.v(TAG, "DalvikBle, init done, scanner at "+scanner);
     }
 
     // BLE BEACONS
@@ -342,11 +342,21 @@ public class DalvikBleService  {
         if (debug) {
             Log.v(TAG, "Connect to device " + name + " and address " + address);
         }
+        connectInThread(name, address);
+    }
+
+    private void connectInThread(final String name, final String address) {
+        if (debug) {
+Thread.dumpStack();
+            Log.v(TAG, "ConnectNotInThread to device " + name + " and address " + address);
+        }
+        // Thread t = new Thread() {
+            // @Override public void run() {
         BleGattCallback bleGattCallback;
         if (!gatts.containsKey(address)) {
             bleGattCallback = new BleGattCallback(activity, devices.get(address), debug);
             if (debug) {
-                Log.v(TAG, "Create new BleGattCallback: " + bleGattCallback);
+                Log.v(TAG, "Create new BleGattCallbackNotInThread: " + bleGattCallback);
             }
             gatts.put(address, bleGattCallback);
         } else {
@@ -356,6 +366,9 @@ public class DalvikBleService  {
             Log.v(TAG, "Connecting");
         }
         bleGattCallback.connect();
+            // }
+        // };
+        // t.start();
     }
 
     private void disconnect(String name, String address) {

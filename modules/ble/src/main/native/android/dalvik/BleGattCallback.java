@@ -57,12 +57,16 @@ class BleGattCallback extends BluetoothGattCallback {
         this.activity = activity;
         this.bluetoothDevice = bluetoothDevice;
         this.debug = debug;
+Log.v(TAG, "BLEGATT, callback constructor called");
+Thread.dumpStack();
     }
 
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+Log.v(TAG, "BLEGATT, onConnectionStateChanged called");
+Thread.dumpStack();
         if (debug) {
-            Log.v(TAG, "BLE gatt changed from status: " + status + " to status:" + newState);
+            Log.v(TAG, "BLE GATT Changed from status: " + status + " to status:" + newState);
         }
         switch (newState) {
             case BluetoothProfile.STATE_CONNECTED:
@@ -302,7 +306,20 @@ class BleGattCallback extends BluetoothGattCallback {
     }
 
     // native
-    private native void setState(String name, String state);
+    private void setState(final String name, final String state) {
+Log.v(TAG, "BLEsetState, dalvik");
+        Thread t = new Thread() {
+            @Override public void run() {
+Log.v(TAG, "BLEsetState, invoke native");
+                setNativeState(name, state);
+Log.v(TAG, "BLEsetState, invoked native");
+            }
+        };
+        t.start();
+Log.v(TAG, "BLEsetState, dalvikked");
+    }
+
+    private native void setNativeState(String name, String state);
     private native void addProfile(String name, String uuid, String type);
     private native void addCharacteristic(String name, String profileUuid, String charUuid, String properties);
     private native void addDescriptor(String name, String profileUuid, String charUuid, String descUuid, byte[] value);
