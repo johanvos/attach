@@ -323,11 +323,19 @@ public class DalvikBleService  {
 
     private void startScanningPeripherals() {
         Log.v(TAG, "BLE startScanningPeripherals");
+Thread t = new Thread() {
+@Override public void run() {
+        Log.v(TAG, "BLE startScanningPeripherals in new Thread");
         devices.clear();
-        this.deviceCallback = createDeviceCallback();
+        DalvikBleService.this.deviceCallback = createDeviceCallback();
         if (scanner != null) {
             scanner.startScan(deviceCallback);
         }
+        Log.v(TAG, "BLE startScanningPeripherals in new Thread done");
+};
+};
+t.start();
+        Log.v(TAG, "BLE startScanningPeripherals, thread started");
     }
 
     private void stopScanningPeripherals() {
@@ -350,8 +358,8 @@ public class DalvikBleService  {
 Thread.dumpStack();
             Log.v(TAG, "ConnectNotInThread to device " + name + " and address " + address);
         }
-        // Thread t = new Thread() {
-            // @Override public void run() {
+        Thread t = new Thread() {
+             @Override public void run() {
         BleGattCallback bleGattCallback;
         if (!gatts.containsKey(address)) {
             bleGattCallback = new BleGattCallback(activity, devices.get(address), debug);
@@ -366,9 +374,9 @@ Thread.dumpStack();
             Log.v(TAG, "Connecting");
         }
         bleGattCallback.connect();
-            // }
-        // };
-        // t.start();
+             }
+         };
+         t.start();
     }
 
     private void disconnect(String name, String address) {

@@ -307,22 +307,66 @@ Thread.dumpStack();
 
     // native
     private void setState(final String name, final String state) {
+Thread.dumpStack();
 Log.v(TAG, "BLEsetState, dalvik");
+Log.v(TAG, "BLEsetState, dalvik, ctn = "+Thread.currentThread().getName());
         Thread t = new Thread() {
             @Override public void run() {
 Log.v(TAG, "BLEsetState, invoke native");
                 setNativeState(name, state);
-Log.v(TAG, "BLEsetState, invoked native");
             }
         };
         t.start();
-Log.v(TAG, "BLEsetState, dalvikked");
+    }
+
+    private void addProfile(final String name, final String uuid, final String type) {
+Log.v(TAG, "BLEaddProfile, dalvik");
+        Thread t = new Thread() {
+            @Override public void run() {
+Log.v(TAG, "BLEaddProfile, invoke native");
+                addNativeProfile(name, uuid, type);
+            }
+        };
+        t.start();
+    }
+
+    private void addCharacteristic(final String name, final String profileUuid, final String charUuid, final String properties) {
+Log.v(TAG, "BLEaddCharacteristic, dalvik");
+        Thread t = new Thread() {
+            @Override public void run() {
+Log.v(TAG, "BLEaddCharacteristic, invoke native");
+                addNativeCharacteristic(name, profileUuid, charUuid, properties);
+            }
+        };
+        t.start();
+    }
+
+    private void addDescriptor(final String name, final String profileUuid, final String charUuid, final String descUuid, final byte[] value) {
+Log.v(TAG, "BLEaddCharacteristic, dalvik");
+        Thread t = new Thread() {
+            @Override public void run() {
+Log.v(TAG, "BLEaddCharacteristic, invoke native");
+                addNativeDescriptor(name, profileUuid, charUuid, descUuid, value);
+            }
+        };
+        t.start();
+    }
+
+    private void setValue(final String name, final String charUuid, final byte[] value) {
+Log.v(TAG, "BLESetValue, dalvik");
+        Thread t = new Thread() {
+            @Override public void run() {
+Log.v(TAG, "BLESetValue, invoke native");
+                setNativeValue(name, charUuid, value);
+            }
+        };
+        t.start();
     }
 
     private native void setNativeState(String name, String state);
-    private native void addProfile(String name, String uuid, String type);
-    private native void addCharacteristic(String name, String profileUuid, String charUuid, String properties);
-    private native void addDescriptor(String name, String profileUuid, String charUuid, String descUuid, byte[] value);
-    private native void setValue(String name, String charUuid, byte[] value);
+    private native void addNativeProfile(String name, String uuid, String type);
+    private native void addNativeCharacteristic(String name, String profileUuid, String charUuid, String properties);
+    private native void addNativeDescriptor(String name, String profileUuid, String charUuid, String descUuid, byte[] value);
+    private native void setNativeValue(String name, String charUuid, byte[] value);
 
 }
